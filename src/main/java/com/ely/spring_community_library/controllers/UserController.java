@@ -8,10 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/users")
@@ -23,10 +20,7 @@ public class UserController {
     @PostMapping
     private ResponseEntity<User> createUser(@RequestBody @Valid CreateUserDto userDto) {
 
-        final User createdUser = userService.createUser(userDto);
-        final URI location = URI.create("/users/" + createdUser.getId());
-
-        return ResponseEntity.created(location).body(createdUser);
+        return userService.createUser(userDto);
     }
 
     @GetMapping
@@ -36,26 +30,20 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    private ResponseEntity<Optional<User>> getUserById(@PathVariable("id") Long id) {
+    private ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
 
-        final Optional<User> user = userService.getUserById(id);
-
-        if(user.isPresent()) {
-            return ResponseEntity.ok(user);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return userService.getUserById(id);
     }
 
     @PutMapping("/{id}")
-    private ResponseEntity<Optional<User>> updateUserById(@PathVariable("id") Long id,
-                                                          @RequestBody @Valid UpdateUserDto userDto) {
-        final Optional<User> updatedUser = userService.updateUserById(id, userDto);
+    private ResponseEntity<User> updateUserById(@PathVariable("id") Long id,
+                                                @RequestBody @Valid UpdateUserDto userDto) {
+        return userService.updateUserById(id, userDto);
+    }
 
-        if(updatedUser.isPresent()) {
-            return ResponseEntity.ok(updatedUser);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    @DeleteMapping("/{id}")
+    private ResponseEntity<Void> deleteUserById(@PathVariable("id") Long id) {
+
+        return userService.deleteUserById(id);
     }
 }
