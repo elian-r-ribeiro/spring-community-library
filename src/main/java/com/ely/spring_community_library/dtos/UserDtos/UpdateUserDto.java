@@ -1,4 +1,4 @@
-package com.ely.spring_community_library.dtos;
+package com.ely.spring_community_library.dtos.UserDtos;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;

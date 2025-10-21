@@ -1,7 +1,7 @@
 package com.ely.spring_community_library.services;
 
-import com.ely.spring_community_library.dtos.CreateUserDto;
-import com.ely.spring_community_library.dtos.UpdateUserDto;
+import com.ely.spring_community_library.dtos.UserDtos.CreateUserDto;
+import com.ely.spring_community_library.dtos.UserDtos.UpdateUserDto;
 import com.ely.spring_community_library.entities.User;
 import com.ely.spring_community_library.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
