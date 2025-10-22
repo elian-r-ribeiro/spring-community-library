@@ -1,12 +1,20 @@
 package com.ely.spring_community_library.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "loans")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Loan {
 
     @Id
@@ -25,7 +33,7 @@ public class Loan {
     @Column(name = "loan_date")
     private LocalDate loanData;
 
-    @Column(name = "return_date", nullable = true)
+    @Column(name = "return_date")
     private LocalDate returnDate;
 
     private boolean returned;

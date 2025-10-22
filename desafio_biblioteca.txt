@@ -1,0 +1,80 @@
+💡 Desafio: Sistema de Gestão de Biblioteca Comunitária
+
+🎯 Objetivo
+Criar uma API em Spring Boot que gerencie uma biblioteca comunitária, permitindo o empréstimo de livros, o controle de devoluções, o cadastro de usuários e um histórico de atividades.
+
+🧱 Estrutura do Projeto
+
+Entidades principais:
+
+1. User
+- id: Long
+- name: String
+- email: String
+- registrationDate: LocalDate
+- active: boolean
+
+2. Book
+- id: Long
+- title: String
+- author: String
+- isbn: String
+- availableCopies: int
+- totalCopies: int
+- createdAt: LocalDate
+
+3. Loan
+- id: Long
+- user: User
+- book: Book
+- loanDate: LocalDate
+- returnDate: LocalDate? (nulo enquanto o livro não é devolvido)
+- returned: boolean
+
+4. ActivityLog
+- id: Long
+- action: String
+- timestamp: LocalDateTime
+
+🔧 Funcionalidades obrigatórias
+
+CRUDs básicos
+- Usuários: criar, listar, editar, excluir.
+- Livros: criar, listar, editar, excluir.
+
+Funcionalidades extras
+- Empréstimos:
+  - Criar um novo empréstimo (reduz availableCopies do livro).
+  - Marcar devolução (aumenta availableCopies).
+  - Impedir empréstimo se availableCopies == 0.
+- Logs automáticos:
+  - Cada empréstimo ou devolução gera uma entrada no ActivityLog.
+- Consulta personalizada:
+  - Listar todos os livros emprestados por um usuário.
+  - Listar todos os empréstimos em aberto.
+  - Listar os logs das últimas 24h.
+
+🧩 Desafios técnicos
+- Relacionamentos: @ManyToOne entre Loan → User e Loan → Book
+- Transações: atualizar livro e salvar log no mesmo fluxo.
+- Validações: impedir empréstimo duplicado e email único.
+
+🚀 Extensões opcionais
+- Filtros com Spring Data JPA
+- Paginação e ordenação
+- Spring Security (básico)
+- Swagger
+- Docker Compose com PostgreSQL
+
+💬 Exemplo de endpoints
+| Método | Endpoint | Descrição |
+|--------|-----------|-----------|
+| POST | /users | Cria um usuário |
+| GET | /books | Lista todos os livros |
+| POST | /loans | Cria um empréstimo |
+| PATCH | /loans/{id}/return | Marca devolução |
+| GET | /users/{id}/loans | Lista empréstimos de um usuário |
+| GET | /logs/recent | Mostra logs recentes |
+
+🗃️ Banco de Dados sugerido
+PostgreSQL com Spring Data JPA

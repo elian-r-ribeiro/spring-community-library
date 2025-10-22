@@ -18,9 +18,13 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-     public ResponseEntity<User> createUser(CreateUserDto userDto) {
+     public ResponseEntity<User> createUser(CreateUserDto createUserDto) {
 
-        final User newUser = new User(null, userDto.name(), userDto.email(), null, userDto.active());
+        final User newUser = new User(
+                null, createUserDto.name(),
+                createUserDto.email(),
+                null,
+                createUserDto.active());
 
         return ResponseEntity.ok(userRepository.save(newUser));
     }
@@ -43,26 +47,30 @@ public class UserService {
          }
     }
 
-    public ResponseEntity<User> updateUserById(Long id, UpdateUserDto userDto) {
+    public ResponseEntity<User> updateUserById(Long id, UpdateUserDto updateUserDto) {
 
          Optional<User> oldUser = userRepository.findById(id);
 
          if(oldUser.isPresent()) {
 
-             User updatedUser = oldUser.get();
-
-             if(userDto.name() != null) {
-                updatedUser.setName(userDto.name());
-             }
-             if(userDto.email() != null) {
-                 updatedUser.setEmail(userDto.email());
-             }
-             updatedUser.setActive(userDto.active());
+             User updatedUser = mergeUserChanges(oldUser.get(), updateUserDto);
 
              return ResponseEntity.ok(userRepository.save(updatedUser));
          } else {
              return ResponseEntity.notFound().build();
          }
+    }
+
+    private User mergeUserChanges (User oldUser, UpdateUserDto updateUserDto) {
+
+        if(updateUserDto.name() != null) {
+            oldUser.setName(updateUserDto.name());
+        }
+        if(updateUserDto.email() != null) {
+            oldUser.setEmail(updateUserDto.email());
+        }
+
+        return oldUser;
     }
 
     public ResponseEntity<Void> deleteUserById(Long id) {

@@ -57,37 +57,43 @@ public class BookService {
 
         if(oldBook.isPresent()) {
 
-            final Book updatedBook = oldBook.get();
-
-            if(updateBookDto.title() != null) {
-
-                updatedBook.setTitle(updateBookDto.title());
-            }
-
-            if(updateBookDto.author() != null) {
-
-                updatedBook.setAuthor(updateBookDto.author());
-            }
-
-            if(updateBookDto.isbn() != null) {
-
-                updatedBook.setIsbn(updateBookDto.isbn());
-            }
-
-            if(updateBookDto.availableCopies() != null) {
-
-                updatedBook.setAvailableCopies(updateBookDto.availableCopies());
-            }
-
-            if(updateBookDto.totalCopies() != null) {
-
-                updatedBook.setTotalCopies(updateBookDto.totalCopies());
-            }
+            final Book updatedBook = mergeBookChanges(oldBook.get(), updateBookDto);
 
             return ResponseEntity.ok(bookRepository.save(updatedBook));
+        } else {
+
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    private Book mergeBookChanges(Book oldBook, UpdateBookDto updateBookDto) {
+
+        if(updateBookDto.title() != null) {
+
+            oldBook.setTitle(updateBookDto.title());
         }
 
-        return ResponseEntity.notFound().build();
+        if(updateBookDto.author() != null) {
+
+            oldBook.setAuthor(updateBookDto.author());
+        }
+
+        if(updateBookDto.isbn() != null) {
+
+            oldBook.setIsbn(updateBookDto.isbn());
+        }
+
+        if(updateBookDto.availableCopies() != null) {
+
+            oldBook.setAvailableCopies(updateBookDto.availableCopies());
+        }
+
+        if(updateBookDto.totalCopies() != null) {
+
+            oldBook.setTotalCopies(updateBookDto.totalCopies());
+        }
+
+        return oldBook;
     }
 
     public ResponseEntity<Void> deleteBookById(Long id) {
