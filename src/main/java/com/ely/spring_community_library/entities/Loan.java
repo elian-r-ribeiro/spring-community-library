@@ -31,7 +31,7 @@ public class Loan {
 
     @CreationTimestamp
     @Column(name = "loan_date")
-    private LocalDate loanData;
+    private LocalDate loanDate;
 
     @Column(name = "return_date")
     private LocalDate returnDate;

@@ -64,7 +64,7 @@ public class LoanService {
                         loan.getId(),
                         loan.getUser().getName(),
                         loan.getBook().getTitle(),
-                        loan.getLoanData(),
+                        loan.getLoanDate(),
                         loan.getReturnDate(),
                         loan.isReturned()
                 )).toList();
