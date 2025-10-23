@@ -2,6 +2,7 @@ package com.ely.spring_community_library.controllers;
 
 import com.ely.spring_community_library.dtos.LoanDtos.CreateLoanDto;
 import com.ely.spring_community_library.dtos.LoanDtos.LoanDto;
+import com.ely.spring_community_library.dtos.LoanDtos.UpdateLoanDto;
 import com.ely.spring_community_library.entities.Loan;
 import com.ely.spring_community_library.services.LoanService;
 import jakarta.validation.Valid;
@@ -28,5 +29,20 @@ public class LoanController {
     private ResponseEntity<List<LoanDto>> getAllLoans() {
 
         return loanService.getAllLoans();
+    }
+
+    @GetMapping("/{id}")
+    private ResponseEntity<LoanDto> getLoanById(@PathVariable("id") Long id) {
+
+        return loanService.getLoanById(id);
+    }
+
+    @PutMapping("/{id}")
+    private ResponseEntity<Loan> updateLoanById(
+            @PathVariable("id") Long id,
+            @RequestBody UpdateLoanDto updateLoanDto
+    ) {
+
+        return loanService.updateLoanById(id, updateLoanDto);
     }
 }
