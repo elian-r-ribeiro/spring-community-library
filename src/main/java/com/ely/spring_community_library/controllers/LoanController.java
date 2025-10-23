@@ -45,4 +45,10 @@ public class LoanController {
 
         return loanService.updateLoanById(id, updateLoanDto);
     }
+
+    @DeleteMapping("/{id}")
+    private ResponseEntity<Void> deleteLoanById(@PathVariable("id") Long id) {
+
+        return loanService.deleteLoanById(id);
+    }
 }

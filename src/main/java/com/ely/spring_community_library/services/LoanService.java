@@ -167,4 +167,18 @@ public class LoanService {
 
         return ResponseEntity.ok(loan);
     }
+
+    public ResponseEntity<Void> deleteLoanById(Long id) {
+
+        Optional<Loan> loanToDelete = loanRepository.findById(id);
+
+        if(loanToDelete.isPresent()) {
+
+            loanRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } else {
+
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
