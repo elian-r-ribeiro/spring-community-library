@@ -1,11 +1,14 @@
 package com.ely.spring_community_library.services;
 
 import com.ely.spring_community_library.dtos.LoanDtos.CreateLoanDto;
+import com.ely.spring_community_library.dtos.LoanDtos.DeleteLoanDto;
 import com.ely.spring_community_library.dtos.LoanDtos.LoanDto;
 import com.ely.spring_community_library.dtos.LoanDtos.UpdateLoanDto;
 import com.ely.spring_community_library.entities.Book;
 import com.ely.spring_community_library.entities.Loan;
 import com.ely.spring_community_library.entities.User;
+import com.ely.spring_community_library.exceptions.AvailableCopiesBiggerThanTotalCopiesException;
+import com.ely.spring_community_library.exceptions.NoAvailableCopiesException;
 import com.ely.spring_community_library.repositories.BookRepository;
 import com.ely.spring_community_library.repositories.LoanRepository;
 import com.ely.spring_community_library.repositories.UserRepository;
@@ -45,6 +48,8 @@ public class LoanService {
                     createLoanDto.returned()
             );
 
+            checkIfAvailableCopiesCanBeReducedAndReduce(bookFromLoan.get());
+
             return ResponseEntity.ok(loanRepository.save(newLoan));
         } else {
 
@@ -64,8 +69,8 @@ public class LoanService {
         return loans.stream()
                 .map(loan -> new LoanDto(
                         loan.getId(),
-                        loan.getUser().getName(),
-                        loan.getBook().getTitle(),
+                        loan.getUser().getId(),
+                        loan.getBook().getId(),
                         loan.getLoanDate(),
                         loan.getReturnDate(),
                         loan.isReturned()
@@ -89,15 +94,15 @@ public class LoanService {
 
         return new LoanDto(
                 loan.getId(),
-                loan.getUser().getName(),
-                loan.getBook().getTitle(),
+                loan.getUser().getId(),
+                loan.getBook().getId(),
                 loan.getLoanDate(),
                 loan.getReturnDate(),
                 loan.isReturned()
         );
     }
 
-    public ResponseEntity<Loan> updateLoanById(Long id, UpdateLoanDto updateLoanDto) {
+    public ResponseEntity<LoanDto> updateLoanById(Long id, UpdateLoanDto updateLoanDto) {
 
         final Optional<Loan> oldLoan = loanRepository.findById(id);
 
@@ -112,8 +117,10 @@ public class LoanService {
             }
 
             Loan updatedLoan = response.getBody();
-
-            return ResponseEntity.ok(mergeLoanChanges(updateLoanDto, updatedLoan));
+            updatedLoan = mergeLoanChanges(updateLoanDto, updatedLoan);
+            loanRepository.save(updatedLoan);
+            LoanDto convertedLoanDto = convertLoanToLoanDto(updatedLoan);
+            return ResponseEntity.ok(convertedLoanDto);
 
         } else {
             return ResponseEntity.notFound().build();
@@ -132,10 +139,49 @@ public class LoanService {
         }
         if(updateLoanDto.returned() != null) {
 
-            loanToUpdate.setReturned(updateLoanDto.returned());
+            loanToUpdate.setReturned(handleReturnedChange(updateLoanDto, loanToUpdate));
         }
 
         return loanToUpdate;
+    }
+
+    private boolean handleReturnedChange(UpdateLoanDto updateLoanDto, Loan loanToUpdate) {
+
+        if(updateLoanDto.returned() == true) {
+
+            if(updateLoanDto.returned() != loanToUpdate.isReturned()) {
+                checkIfAvailableCopiesCanBeIncreasedAndIncrease(loanToUpdate.getBook());
+            }
+        } else {
+
+            if(updateLoanDto.returned() != loanToUpdate.isReturned()) {
+                checkIfAvailableCopiesCanBeReducedAndReduce(loanToUpdate.getBook());
+            }
+        }
+
+        return updateLoanDto.returned();
+    }
+
+    private void checkIfAvailableCopiesCanBeIncreasedAndIncrease(Book book) {
+
+        if(book.getAvailableCopies() + 1 > book.getTotalCopies()) {
+
+            throw new AvailableCopiesBiggerThanTotalCopiesException(
+                    "Número de cópias disponívies irá ultrapassar cópias totais.");
+        }
+
+        book.setAvailableCopies(book.getAvailableCopies() + 1);
+        bookRepository.save(book);
+    }
+
+    private void checkIfAvailableCopiesCanBeReducedAndReduce(Book book) {
+
+        if(book.getAvailableCopies() <= 0) {
+            throw new NoAvailableCopiesException("Não há mais cópias desse livro disponíveis.");
+        }
+
+        book.setAvailableCopies(book.getAvailableCopies() - 1);
+        bookRepository.save(book);
     }
 
     private ResponseEntity<Loan> checkIfUserAndBookArePresent(UpdateLoanDto updateLoanDto, Loan loan) {
@@ -168,17 +214,28 @@ public class LoanService {
         return ResponseEntity.ok(loan);
     }
 
-    public ResponseEntity<Void> deleteLoanById(Long id) {
+    public ResponseEntity<Void> deleteLoanById(Long id, DeleteLoanDto deleteLoanDto) {
 
         Optional<Loan> loanToDelete = loanRepository.findById(id);
 
         if(loanToDelete.isPresent()) {
 
+            Optional<Book> book = bookRepository.findById(loanToDelete.get().getBook().getId());
+
+            checkIfBooksAmountShouldIncrease(book.get(), deleteLoanDto);
             loanRepository.deleteById(id);
             return ResponseEntity.noContent().build();
         } else {
 
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    private void checkIfBooksAmountShouldIncrease(Book book, DeleteLoanDto deleteLoanDto) {
+
+        if(deleteLoanDto.shouldBooksAmoutIncreaseOnDeletion()) {
+            book.setAvailableCopies(book.getAvailableCopies() + 1);
+            bookRepository.save(book);
         }
     }
 }

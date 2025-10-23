@@ -1,6 +1,7 @@
 package com.ely.spring_community_library.controllers;
 
 import com.ely.spring_community_library.dtos.LoanDtos.CreateLoanDto;
+import com.ely.spring_community_library.dtos.LoanDtos.DeleteLoanDto;
 import com.ely.spring_community_library.dtos.LoanDtos.LoanDto;
 import com.ely.spring_community_library.dtos.LoanDtos.UpdateLoanDto;
 import com.ely.spring_community_library.entities.Loan;
@@ -38,17 +39,20 @@ public class LoanController {
     }
 
     @PutMapping("/{id}")
-    private ResponseEntity<Loan> updateLoanById(
+    private ResponseEntity<LoanDto> updateLoanById(
             @PathVariable("id") Long id,
-            @RequestBody UpdateLoanDto updateLoanDto
+            @RequestBody @Valid UpdateLoanDto updateLoanDto
     ) {
 
         return loanService.updateLoanById(id, updateLoanDto);
     }
 
     @DeleteMapping("/{id}")
-    private ResponseEntity<Void> deleteLoanById(@PathVariable("id") Long id) {
+    private ResponseEntity<Void> deleteLoanById(
+            @PathVariable("id") Long id,
+            @RequestBody DeleteLoanDto deleteLoanDto
+    ) {
 
-        return loanService.deleteLoanById(id);
+        return loanService.deleteLoanById(id, deleteLoanDto);
     }
 }
