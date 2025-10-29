@@ -6,6 +6,7 @@ import com.ely.spring_community_library.entities.User;
 import com.ely.spring_community_library.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,55 +19,66 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-     public ResponseEntity<User> createUser(CreateUserDto createUserDto) {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    public ResponseEntity<User> createUser(CreateUserDto createUserDto) {
+
+        String encryptedPassword = passwordEncoder.encode(createUserDto.password());
+
+        System.out.println(encryptedPassword);
 
         final User newUser = new User(
-                null, createUserDto.name(),
-                createUserDto.email(),
                 null,
-                createUserDto.active());
+                createUserDto.name(),
+                createUserDto.email(),
+                encryptedPassword,
+                null,
+                createUserDto.role(),
+                createUserDto.active()
+        );
 
         return ResponseEntity.ok(userRepository.save(newUser));
     }
 
     public List<User> getAllUsers() {
 
-         return userRepository.findAll();
+        return userRepository.findAll();
     }
 
     public ResponseEntity<User> getUserById(Long id) {
 
-         Optional<User> userEntity = userRepository.findById(id);
+        Optional<User> userEntity = userRepository.findById(id);
 
-         if(userEntity.isPresent()) {
+        if (userEntity.isPresent()) {
 
-             return ResponseEntity.ok(userEntity.get());
-         } else {
+            return ResponseEntity.ok(userEntity.get());
+        } else {
 
-             return ResponseEntity.notFound().build();
-         }
+            return ResponseEntity.notFound().build();
+        }
     }
 
     public ResponseEntity<User> updateUserById(Long id, UpdateUserDto updateUserDto) {
 
-         Optional<User> oldUser = userRepository.findById(id);
+        Optional<User> oldUser = userRepository.findById(id);
 
-         if(oldUser.isPresent()) {
+        if (oldUser.isPresent()) {
 
-             User updatedUser = mergeUserChanges(oldUser.get(), updateUserDto);
+            User updatedUser = mergeUserChanges(oldUser.get(), updateUserDto);
 
-             return ResponseEntity.ok(userRepository.save(updatedUser));
-         } else {
-             return ResponseEntity.notFound().build();
-         }
+            return ResponseEntity.ok(userRepository.save(updatedUser));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    private User mergeUserChanges (User oldUser, UpdateUserDto updateUserDto) {
+    private User mergeUserChanges(User oldUser, UpdateUserDto updateUserDto) {
 
-        if(updateUserDto.name() != null) {
+        if (updateUserDto.name() != null) {
             oldUser.setName(updateUserDto.name());
         }
-        if(updateUserDto.email() != null) {
+        if (updateUserDto.email() != null) {
             oldUser.setEmail(updateUserDto.email());
         }
 
@@ -75,15 +87,15 @@ public class UserService {
 
     public ResponseEntity<Void> deleteUserById(Long id) {
 
-         Optional<User> userToDelete = userRepository.findById(id);
+        Optional<User> userToDelete = userRepository.findById(id);
 
-         if(userToDelete.isPresent()) {
+        if (userToDelete.isPresent()) {
 
-             userRepository.deleteById(id);
-             return ResponseEntity.noContent().build();
-         } else{
+            userRepository.deleteById(id);
+            return ResponseEntity.noContent().build();
+        } else {
 
-             return ResponseEntity.notFound().build();
-         }
+            return ResponseEntity.notFound().build();
+        }
     }
 }
