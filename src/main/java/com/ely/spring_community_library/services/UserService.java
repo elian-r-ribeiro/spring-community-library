@@ -6,6 +6,9 @@ import com.ely.spring_community_library.entities.User;
 import com.ely.spring_community_library.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,32 +17,10 @@ import java.util.Optional;
 
 @SuppressWarnings("all")
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    public ResponseEntity<User> createUser(CreateUserDto createUserDto) {
-
-        String encryptedPassword = passwordEncoder.encode(createUserDto.password());
-
-        System.out.println(encryptedPassword);
-
-        final User newUser = new User(
-                null,
-                createUserDto.name(),
-                createUserDto.email(),
-                encryptedPassword,
-                null,
-                createUserDto.role(),
-                createUserDto.active()
-        );
-
-        return ResponseEntity.ok(userRepository.save(newUser));
-    }
 
     public List<User> getAllUsers() {
 
@@ -97,5 +78,10 @@ public class UserService {
 
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByEmail(username);
     }
 }
