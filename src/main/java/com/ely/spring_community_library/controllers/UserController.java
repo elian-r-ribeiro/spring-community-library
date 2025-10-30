@@ -1,6 +1,5 @@
 package com.ely.spring_community_library.controllers;
 
-import com.ely.spring_community_library.dtos.UserDtos.CreateUserDto;
 import com.ely.spring_community_library.dtos.UserDtos.UpdateUserDto;
 import com.ely.spring_community_library.entities.User;
 import com.ely.spring_community_library.services.UserService;
@@ -16,12 +15,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
-    @PostMapping
-    private ResponseEntity<User> createUser(@RequestBody @Valid CreateUserDto userDto) {
-
-        return userService.createUser(userDto);
-    }
 
     @GetMapping
     private ResponseEntity<List<User>> getAllUsers() {
