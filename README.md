@@ -1,7 +1,7 @@
 
 # Community Library
 
-Olá! Esse é meu primeiro projeto "completo" usando Spring Boot com JPA e (futuramente) Spring Security JWT. Se trata de uma A.P.I. para uma biblioteca, de controle de estoque e locação de livros.
+Olá! Esse é meu primeiro projeto "completo" usando Spring Boot com JPA e Spring Security JWT. Se trata de uma A.P.I. para uma biblioteca, de controle de estoque e locação de livros.
 
 
 ## Rodando o projeto
@@ -21,27 +21,40 @@ Opcional: server.port=porta. Caso haja algum clonflito de portas, você pode alt
 
 Após realizar essas configurações, seu projeto deve estar pronto para rodar. Se estiver em uma I.D.E., basta utilizar o runner dela, caso não, abra o console na pasta do projeto e digite: mvn spring-boot:run. Caso nenhuma mensagem de erro apareça, o projeto está funcionando corretamente.
 
+O primeiro passo agora é ir até a rota de register, listada abaixo, e criar uma nova conta. Recomendamos criar com a role "MANAGER", para ter acesso á todos os end-points. Após isso, vá até a rota de login, também listada abaixo, e realize o login com o usuário criado. Isso irá retornar um Token na response, copie-o e, para cada outra requisição que for realizar, vá até Auth, adicione uma Auth do tipo Bearer Token, cole o token no campo de token e "Bearer" no prefix.
 
 ## End-points
 
 Abra o aplicativo que irá utilizar para realizar requisições HTTP e teste:
 
-#### Criar novo usuário
+#### Registrar novo usuário
 
 ```http
-  POST http://localhost:porta_definida_nas_configurações/users
+  POST http://localhost:porta_definida_nas_configurações/auth/register (aberto)
 ```
 
 | Body(JSON)   | Tipo       | Descrição                           |
 | :---------- | :--------- | :---------------------------------- |
 | `name` | `String` | **Obrigatório**. O nome do usuário |
 | `email` | `String` | **Obrigatório**. O email do usuário |
+| `password` | `String` | **Obrigatório**. A senha do usuário |
+| `role` | `ENUM` | **Obrigatório**. O cargo do usuário (MANAGER ou USER) |
 | `active` | `boolean` | Se o usuário está ativo |
+
+```http
+  POST http://localhost:porta_definida_nas_configurações/auth/login (aberto)
+```
+#### Logar com usuário
+
+| Body(JSON)   | Tipo       | Descrição                           |
+| :---------- | :--------- | :---------------------------------- |
+| `email` | `String` | **Obrigatório**. O email do usuário |
+| `password` | `String` | **Obrigatório**. A senha do usuário |
 
 #### Editar um usuário
 
 ```http
-  PUT http://localhost:porta_definida_nas_configurações/users
+  PUT http://localhost:porta_definida_nas_configurações/users (MANAGER)
 ```
 
 | Body(JSON)   | Tipo       | Descrição                           |
@@ -53,25 +66,25 @@ Abra o aplicativo que irá utilizar para realizar requisições HTTP e teste:
 #### Deletar usuário
 
 ```http
-  DELETE http://localhost:porta_definida_nas_configurações/users/id
+  DELETE http://localhost:porta_definida_nas_configurações/users/id (MANAGER)
 ```
 
 #### Listar todos os usuário
 
 ```http
-  GET http://localhost:porta_definida_nas_configurações/users
+  GET http://localhost:porta_definida_nas_configurações/users (MANAGER)
 ```
 
 #### Listar usuário por ID
 
 ```http
-  GET http://localhost:porta_definida_nas_configurações/users/id
+  GET http://localhost:porta_definida_nas_configurações/users/id (MANAGER)
 ```
 
 #### Criar um livro
 
 ```http
-  POST http://localhost:porta_definida_nas_configurações/books
+  POST http://localhost:porta_definida_nas_configurações/books (MANAGER)
 ```
 
 | Body(JSON)   | Tipo       | Descrição                           |
@@ -85,7 +98,7 @@ Abra o aplicativo que irá utilizar para realizar requisições HTTP e teste:
 #### Editar um livro
 
 ```http
-  PUT http://localhost:porta_definida_nas_configurações/books
+  PUT http://localhost:porta_definida_nas_configurações/books (MANAGER)
 ```
 
 | Body(JSON)   | Tipo       | Descrição                           |
@@ -99,25 +112,25 @@ Abra o aplicativo que irá utilizar para realizar requisições HTTP e teste:
 #### Deletar livro
 
 ```http
-  DELETE http://localhost:porta_definida_nas_configurações/books/id
+  DELETE http://localhost:porta_definida_nas_configurações/books/id (MANAGER)
 ```
 
 #### Listar todos os livros
 
 ```http
-  GET http://localhost:porta_definida_nas_configurações/books
+  GET http://localhost:porta_definida_nas_configurações/books (USER)
 ```
 
 #### Listar livros por ID
 
 ```http
-  GET http://localhost:porta_definida_nas_configurações/books/id
+  GET http://localhost:porta_definida_nas_configurações/books/id (USER)
 ```
 
 #### Criar uma locação de livro
 
 ```http
-  POST http://localhost:porta_definida_nas_configurações/loans
+  POST http://localhost:porta_definida_nas_configurações/loans (MANAGER)
 ```
 
 | Body(JSON)   | Tipo       | Descrição                           |
@@ -131,7 +144,7 @@ Abra o aplicativo que irá utilizar para realizar requisições HTTP e teste:
 #### Editar uma locação
 
 ```http
-  PUT http://localhost:porta_definida_nas_configurações/loans
+  PUT http://localhost:porta_definida_nas_configurações/loans (MANAGER)
 ```
 
 | Body(JSON)   | Tipo       | Descrição                           |
@@ -145,19 +158,19 @@ Abra o aplicativo que irá utilizar para realizar requisições HTTP e teste:
 #### Deletar uma locação
 
 ```http
-  DELETE http://localhost:porta_definida_nas_configurações/loans/id
+  DELETE http://localhost:porta_definida_nas_configurações/loans/id (MANAGER)
 ```
 
 #### Listar todas as locações
 
 ```http
-  GET http://localhost:porta_definida_nas_configurações/loans
+  GET http://localhost:porta_definida_nas_configurações/loans (MANAGER)
 ```
 
 #### Listar locação por ID
 
 ```http
-  GET http://localhost:porta_definida_nas_configurações/loans/id
+  GET http://localhost:porta_definida_nas_configurações/loans/id (MANAGER)
 ```
 
 
